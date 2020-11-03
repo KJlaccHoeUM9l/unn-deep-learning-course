@@ -5,7 +5,7 @@ class SoftmaxCCE:
     @staticmethod
     def compute_loss(logits, reference_answers):
         logits_for_answers = logits[np.arange(len(logits)), reference_answers]
-        xentropy = - logits_for_answers + np.log(np.sum(np.exp(logits), axis=-1))
+        xentropy = -logits_for_answers + np.log(np.sum(np.exp(logits), axis=-1))
         return xentropy
 
     @staticmethod
