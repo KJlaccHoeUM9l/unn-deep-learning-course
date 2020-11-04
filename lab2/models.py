@@ -28,10 +28,11 @@ def get_model(name='simple'):
         network.append(Sigmoid())
         network.append(Dense(1000, 10, learning_rate=learning_rate))
     elif name == 'maxpool':
-        network.append(MaxPool(2, 2))
+        network.append(Conv(3, 8, (5, 5), learning_rate=learning_rate))
         network.append(Tanh())
+        network.append(MaxPool(2, 2))
         network.append(Flatten())
-        network.append(Dense(768, 10, learning_rate=learning_rate))
+        network.append(Dense(1568, 10, learning_rate=learning_rate))
     elif name == 'lenet5':
         network.append(Conv(3, 6, (5, 5), learning_rate=learning_rate))
         network.append(AvgPool(2, 2))

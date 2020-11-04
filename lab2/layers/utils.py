@@ -1,6 +1,10 @@
 import numpy as np
 
 
+def xavier_initialization(shape, in_size, out_size):
+    return np.random.uniform(-1, 1, size=shape) * np.sqrt(6. / (in_size + out_size))
+
+
 def get_im2col_indices(x_shape, field_height, field_width, padding=1, stride=1):
     N, C, H, W = x_shape
     assert (H + 2 * padding - field_height) % stride == 0

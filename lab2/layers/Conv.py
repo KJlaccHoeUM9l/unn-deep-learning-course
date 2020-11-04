@@ -3,7 +3,7 @@ import numpy as np
 from typing import Tuple
 
 from layers.Layer import Layer
-from layers.utils import im2col_indices, col2im_indices
+from layers.utils import xavier_initialization, im2col_indices, col2im_indices
 
 
 class Conv(Layer):
@@ -14,7 +14,7 @@ class Conv(Layer):
         self.stride = stride
         self.padding = padding
 
-        self.filters = np.random.randn(out_channels, in_channels, kernel_size[0], kernel_size[1]) * 0.01
+        self.filters = xavier_initialization((out_channels, in_channels, kernel_size[0], kernel_size[1]), in_channels, out_channels)
         self.biases = np.zeros(out_channels)
 
         self.input_col = None

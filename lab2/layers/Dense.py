@@ -1,6 +1,7 @@
 import numpy as np
 
 from layers.Layer import Layer
+from layers.utils import xavier_initialization
 
 
 class Dense(Layer):
@@ -9,9 +10,7 @@ class Dense(Layer):
         self.name = 'Dense'
         self.learning_rate = learning_rate
 
-        # initialize weights with small random numbers. We use normal initialization,
-        # but surely there is something better. Try this once you got it working: http://bit.ly/2vTlmaJ
-        self.weights = np.random.randn(input_units, output_units) * 0.01
+        self.weights = xavier_initialization((input_units, output_units), input_units, output_units)
         self.biases = np.zeros(output_units)
 
     def forward(self, input):

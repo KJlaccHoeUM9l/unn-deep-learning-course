@@ -55,7 +55,7 @@ def main():
     data_manager = DataManager('/home/agladyshev/Documents/UNN/DL/Datasets/cifar-10-batches-py/data_batch_1', like_images=True)
     X_train, X_val, y_train, y_val = data_manager.get_train_data()
 
-    network = get_model('test')
+    network = get_model('lenet5')
 
     train_log = []
     val_log = []
