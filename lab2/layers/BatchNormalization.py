@@ -40,7 +40,8 @@ class BatchNormalization(Layer):
         return out
 
     def backward(self, input, grad_output):
-        n, d, _, _ = input.shape
+        n = input.shape[0]
+        d = input.shape[1]
 
         input_mu = input - self.__batch_mean
         std_inv = 1. / np.sqrt(self.__batch_var + self.__eps)

@@ -16,7 +16,6 @@ class Model:
         layer_inputs = [X] + layer_activations
         logits = layer_activations[-1]
 
-        # Compute the loss and the initial gradient
         loss = loss_function.compute_loss(logits, y)
         loss_grad = loss_function.compute_grad(logits, y)
 
@@ -26,9 +25,13 @@ class Model:
 
         return np.mean(loss)
 
-    def predict(self, X):
-        logits = self.__forward(X)[-1]
-        return logits.argmax(axis=-1)
+    def predict(self, X, batch_step=1000):
+        n_iterations = 1 + int(len(X) / batch_step)
+        result = np.array([], dtype=int)
+        for iteration in range(n_iterations):
+            start_ind = batch_step * iteration
+            result = np.append(result, self.__predict_on_batch(X[start_ind:min(start_ind + batch_step, len(X)), :]))
+        return result
 
     def save_state_dict(self, accuracy, save_root_path='.'):
         if accuracy >= self.__accuracy:
@@ -56,3 +59,7 @@ class Model:
             input = layer.forward(input)
             activations.append(input)
         return activations
+
+    def __predict_on_batch(self, X):
+        logits = self.__forward(X)[-1]
+        return logits.argmax(axis=-1)

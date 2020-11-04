@@ -10,7 +10,7 @@ from layers.Dropout import Dropout
 
 
 class Lenet5XXX(Model):
-    def __init__(self, learning_rate):
+    def __init__(self, learning_rate, use_dropout=False):
         super().__init__()
         self.name = 'Lenet5XXX'
         self.learning_rate = learning_rate
@@ -20,12 +20,14 @@ class Lenet5XXX(Model):
         self.network.append(ReLU())
         self.network.append(BatchNormalization())
         self.network.append(MaxPool(2, 2))
-        # self.network.append(Dropout(0.2))
+        if use_dropout:
+            self.network.append(Dropout(0.2))
         self.network.append(Conv(6, 16, (5, 5), learning_rate=learning_rate))
         self.network.append(ReLU())
         self.network.append(BatchNormalization())
         self.network.append(MaxPool(2, 2))
-        # self.network.append(Dropout(0.3))
+        if use_dropout:
+            self.network.append(Dropout(0.3))
         self.network.append(Conv(16, 120, (5, 5), learning_rate=learning_rate))
         self.network.append(ReLU())
         self.network.append(Flatten())
