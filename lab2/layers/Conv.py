@@ -55,3 +55,10 @@ class Conv(Layer):
         self.biases = self.biases - self.learning_rate * grad_biases
 
         return grad_input
+
+    def get_state(self):
+        return self.name, {'filters': self.filters, 'biases': self.biases}
+
+    def set_state(self, params_dict):
+        self.filters = params_dict['filters']
+        self.biases = params_dict['biases']

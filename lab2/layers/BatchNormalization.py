@@ -57,3 +57,10 @@ class BatchNormalization(Layer):
         self.beta = self.beta - self.learning_rate * grad_beta
 
         return grad_input
+
+    def get_state(self):
+        return self.name, {'gamma': self.gamma, 'beta': self.beta}
+
+    def set_state(self, params_dict):
+        self.gamma = params_dict['gamma']
+        self.beta = params_dict['beta']

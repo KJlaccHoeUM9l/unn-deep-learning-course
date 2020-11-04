@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -26,12 +27,16 @@ def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
 
 def main():
     np.random.seed(47)
+    weights_root_path = './weights'
+    weights_path = os.path.join(weights_root_path, 'Lenet5XXX_weights_51_acc.tar')
 
     # network = SimpleNet(learning_rate=0.1)
     # network = SimpleConvNet(learning_rate=0.1)
     # network = SimpleMaxPoolNet(learning_rate=0.1)
     # network = Lenet5(learning_rate=0.1)
-    network = Lenet5XXX(learning_rate=0.1)
+    network = Lenet5XXX(learning_rate=0.01)
+    if weights_path is not None:
+        network.load_state_dict(weights_path)
 
     data_manager = DataManager('/home/agladyshev/Documents/UNN/DL/Datasets/cifar-10-batches-py/data_batch_1', like_images=True)
     X_train, X_val, y_train, y_val = data_manager.get_train_data()
@@ -44,6 +49,8 @@ def main():
 
         train_log.append(np.mean(network.predict(X_train) == y_train))
         val_log.append(np.mean(network.predict(X_val) == y_val))
+
+        # network.save_state_dict(val_log[-1], weights_root_path)
 
         print("Epoch", epoch)
         print("Loss: ", loss)

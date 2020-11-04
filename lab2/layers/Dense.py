@@ -30,3 +30,10 @@ class Dense(Layer):
         self.biases = self.biases - self.learning_rate * grad_biases
 
         return grad_input
+
+    def get_state(self):
+        return self.name, {'weights': self.weights, 'biases': self.biases}
+
+    def set_state(self, params_dict):
+        self.weights = params_dict['weights']
+        self.biases = params_dict['biases']
