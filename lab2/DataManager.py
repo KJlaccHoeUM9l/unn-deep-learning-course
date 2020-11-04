@@ -10,12 +10,12 @@ class DataManager:
             raw_train_data = pickle.load(fo, encoding='bytes')
 
         keys = list(raw_train_data.keys())
+        self.train_labels = np.array(raw_train_data[keys[1]])
         self.train_data = np.array(raw_train_data[keys[2]])
-        self.train_data = (self.train_data - np.mean(self.train_data)) / np.std(self.train_data, axis=0)
+
+        self.train_data = (self.train_data - np.mean(self.train_data, axis=0)) / np.std(self.train_data, axis=0)
         if like_images:
             self.train_data = self.train_data.reshape((len(self.train_data), 3, 32, 32))
-
-        self.train_labels = np.array(raw_train_data[keys[1]])
 
         self.train_data, self.val_data, self.train_labels, self.val_labels = train_test_split(self.train_data,
                                                                                               self.train_labels,

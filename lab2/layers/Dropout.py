@@ -8,12 +8,12 @@ class Dropout(Layer):
         super().__init__()
         self.name = 'Dropout'
         self.p = p
-        self.mask_cache = None
+        self.__mask_cache = None
 
-    def forward(self, X):
-        self.mask_cache = np.random.binomial(1, self.p, size=X.shape) / self.p
-        out = X * self.mask_cache
+    def forward(self, input):
+        self.__mask_cache = np.random.binomial(1, self.p, size=input.shape) / self.p
+        out = input * self.__mask_cache
         return out
 
     def backward(self, input, grad_output):
-        return grad_output * self.mask_cache
+        return grad_output * self.__mask_cache

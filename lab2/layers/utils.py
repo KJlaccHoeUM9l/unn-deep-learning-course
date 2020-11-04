@@ -33,8 +33,7 @@ def im2col_indices(x, field_height, field_width, padding=1, stride=1):
     return cols
 
 
-def col2im_indices(cols, x_shape, field_height=3, field_width=3, padding=1,
-                   stride=1):
+def col2im_indices(cols, x_shape, field_height=3, field_width=3, padding=1, stride=1):
     N, C, H, W = x_shape
     H_padded, W_padded = H + 2 * padding, W + 2 * padding
     x_padded = np.zeros((N, C, H_padded, W_padded), dtype=cols.dtype)

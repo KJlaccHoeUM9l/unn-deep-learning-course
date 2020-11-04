@@ -3,58 +3,57 @@ import numpy as np
 from layers.Layer import Layer
 
 
-def exp_running_avg(running, new, gamma=.9):
+def running_average(running, new, gamma=.9):
     return gamma * running + (1. - gamma) * new
 
 
 class BatchNormalization(Layer):
-    def __init__(self, learning_rate=0.1):
+    def __init__(self, train_mode=True, learning_rate=0.1):
         super().__init__()
         self.name = 'BatchNormalization'
+        self.train_mode = train_mode
         self.learning_rate = learning_rate
-        self.running_mean = 0
-        self.running_var = 1
+
         self.gamma = 1
         self.beta = 0
-        self.train = True
-        self.eps = 0.0000001
-        self.forward_cache = None
 
-    def forward(self, X):
-        if self.train:
-            mu = np.mean(X, axis=0)
-            var = np.var(X, axis=0)
+        self.__eps = 0.0000001
+        self.__running_mean = 0
+        self.__running_var = 1
+        self.__input_norm = None
+        self.__batch_mean = None
+        self.__batch_var = None
 
-            X_norm = (X - mu) / np.sqrt(var + self.eps)
-            out = self.gamma * X_norm + self.beta
+    def forward(self, input):
+        self.__batch_mean = np.mean(input, axis=0)
+        self.__batch_var = np.var(input, axis=0)
+        self.__running_mean = running_average(self.__running_mean, self.__batch_mean)
+        self.__running_var = running_average(self.__running_var, self.__batch_var)
 
-            self.forward_cache = (X_norm, mu, var, self.gamma, self.beta)
-            self.running_mean = exp_running_avg(self.running_mean, mu)
-            self.running_var = exp_running_avg(self.running_var, var)
+        if self.train_mode:
+            self.__input_norm = (input - self.__batch_mean) / np.sqrt(self.__batch_var + self.__eps)
+            out = self.gamma * self.__input_norm + self.beta
         else:
-            X_norm = (X - self.running_mean) / np.sqrt(self.running_var + self.eps)
-            out = self.gamma * X_norm + self.beta
-            self.forward_cache = None
+            input_norm = (input - self.__running_mean) / np.sqrt(self.__running_var + self.__eps)
+            out = self.gamma * input_norm + self.beta
 
         return out
 
-    def backward(self, X, grad_output):
-        X_norm, mu, var, gamma, beta = self.forward_cache
+    def backward(self, input, grad_output):
+        n, d, _, _ = input.shape
 
-        N, D, _, _ = X.shape
+        input_mu = input - self.__batch_mean
+        std_inv = 1. / np.sqrt(self.__batch_var + self.__eps)
 
-        X_mu = X - mu
-        std_inv = 1. / np.sqrt(var + self.eps)
+        grad_input_norm = grad_output * self.gamma
+        grad_var = np.sum(grad_input_norm * input_mu, axis=0) * -.5 * std_inv ** 3
+        grad_mu = np.sum(grad_input_norm * -std_inv, axis=0) + grad_var * np.mean(-2. * input_mu, axis=0)
 
-        dX_norm = grad_output * gamma
-        dvar = np.sum(dX_norm * X_mu, axis=0) * -.5 * std_inv ** 3
-        dmu = np.sum(dX_norm * -std_inv, axis=0) + dvar * np.mean(-2. * X_mu, axis=0)
+        grad_input = (grad_input_norm * std_inv) + (grad_var * 2 * input_mu / n) + (grad_mu / n)
+        grad_gamma = np.sum(grad_output * self.__input_norm, axis=0)
+        grad_beta = np.sum(grad_output, axis=0)
 
-        dX = (dX_norm * std_inv) + (dvar * 2 * X_mu / N) + (dmu / N)
-        dgamma = np.sum(grad_output * X_norm, axis=0)
-        dbeta = np.sum(grad_output, axis=0)
+        self.gamma = self.gamma - self.learning_rate * grad_gamma
+        self.beta = self.beta - self.learning_rate * grad_beta
 
-        self.gamma = self.gamma - self.learning_rate * dgamma
-        self.beta = self.beta - self.learning_rate * dbeta
-
-        return dX
+        return grad_input
