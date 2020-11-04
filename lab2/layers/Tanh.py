@@ -1,16 +1,16 @@
 import numpy as np
 
-from Layer import Layer
+from layers.Layer import Layer
 
 
-class Sigmoid(Layer):
+class Tanh(Layer):
     def __init__(self):
         super().__init__()
-        self.name = 'Sigmoid'
+        self.name = 'Tanh'
 
     def forward(self, input):
-        return 1. / (1. + np.exp(-input))
+        return np.tanh(input)
 
     def backward(self, input, grad_output):
         y = self.forward(input)
-        return y * (1. - y) * grad_output
+        return (1. - y ** 2) * grad_output

@@ -1,6 +1,4 @@
-import numpy as np
-
-from Layer import Layer
+from layers.Layer import Layer
 
 
 class Flatten(Layer):

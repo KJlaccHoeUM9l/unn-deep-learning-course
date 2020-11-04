@@ -1,10 +1,13 @@
-from Dense import Dense
-from Conv import Conv
-from ReLU import ReLU
-from Sigmoid import Sigmoid
-from Tanh import Tanh
-from Flatten import Flatten
-from MaxPool import MaxPool
+from layers.Dense import Dense
+from layers.Conv import Conv
+from layers.ReLU import ReLU
+from layers.Sigmoid import Sigmoid
+from layers.Tanh import Tanh
+from layers.Flatten import Flatten
+from layers.MaxPool import MaxPool
+from layers.AvgPool import AvgPool
+from layers.BatchNormalization import BatchNormalization
+from layers.Dropout import Dropout
 
 
 def get_model(name='simple'):
@@ -31,16 +34,33 @@ def get_model(name='simple'):
         network.append(Dense(768, 10, learning_rate=learning_rate))
     elif name == 'lenet5':
         network.append(Conv(3, 6, (5, 5), learning_rate=learning_rate))
-        network.append(MaxPool(2, 2))
+        network.append(AvgPool(2, 2))
         network.append(Tanh())
         network.append(Conv(6, 16, (5, 5), learning_rate=learning_rate))
-        network.append(MaxPool(2, 2))
+        network.append(AvgPool(2, 2))
         network.append(Tanh())
         network.append(Conv(16, 120, (5, 5), learning_rate=learning_rate))
         network.append(Tanh())
         network.append(Flatten())
         network.append(Dense(120, 84, learning_rate=learning_rate))
         network.append(Tanh())
+        network.append(Dense(84, 10, learning_rate=learning_rate))
+    elif name == 'test':
+        network.append(Conv(3, 6, (5, 5), learning_rate=learning_rate))
+        network.append(ReLU())
+        network.append(BatchNormalization())
+        network.append(MaxPool(2, 2))
+        network.append(Dropout(0.2))
+        network.append(Conv(6, 16, (5, 5), learning_rate=learning_rate))
+        network.append(ReLU())
+        network.append(BatchNormalization())
+        network.append(MaxPool(2, 2))
+        network.append(Dropout(0.3))
+        network.append(Conv(16, 120, (5, 5), learning_rate=learning_rate))
+        network.append(ReLU())
+        network.append(Flatten())
+        network.append(Dense(120, 84, learning_rate=learning_rate))
+        network.append(ReLU())
         network.append(Dense(84, 10, learning_rate=learning_rate))
     else:
         raise ValueError('incorrect net name')

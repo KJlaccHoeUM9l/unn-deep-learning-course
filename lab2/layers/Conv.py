@@ -2,8 +2,8 @@ import numpy as np
 
 from typing import Tuple
 
-from Layer import Layer
-from utils import im2col_indices, col2im_indices
+from layers.Layer import Layer
+from layers.utils import im2col_indices, col2im_indices
 
 
 class Conv(Layer):
