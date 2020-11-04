@@ -4,38 +4,13 @@ import matplotlib.pyplot as plt
 from tqdm import trange
 
 from DataManager import DataManager
-from models import get_model
+from models.SimpleNet import SimpleNet
+from models.SimpleConvNet import SimpleConvNet
+from models.SimpleMaxPoolNet import SimpleMaxPoolNet
+from models.Lenet5 import Lenet5
+from models.Lenet5XXX import Lenet5XXX
+
 from loss_functions import SoftmaxCCE
-
-
-def forward(network, X):
-    activations = []
-    input = X
-    for layer in network:
-        input = layer.forward(input)
-        activations.append(input)
-    return activations
-
-
-def predict(network, X):
-    logits = forward(network, X)[-1]
-    return logits.argmax(axis=-1)
-
-
-def train(network, X, y, loss_function):
-    layer_activations = forward(network, X)
-    layer_inputs = [X] + layer_activations  # layer_input[i] is an input for network[i]
-    logits = layer_activations[-1]
-
-    # Compute the loss and the initial gradient
-    loss = loss_function.compute_loss(logits, y)
-    loss_grad = loss_function.compute_grad(logits, y)
-
-    current_grad = loss_grad
-    for layer_ind in reversed(range(len(network))):
-        current_grad = network[layer_ind].backward(layer_inputs[layer_ind], current_grad)
-
-    return np.mean(loss)
 
 
 def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
@@ -52,20 +27,23 @@ def iterate_minibatches(inputs, targets, batchsize, shuffle=False):
 def main():
     np.random.seed(47)
 
+    # network = SimpleNet(learning_rate=0.1)
+    # network = SimpleConvNet(learning_rate=0.1)
+    # network = SimpleMaxPoolNet(learning_rate=0.1)
+    # network = Lenet5(learning_rate=0.1)
+    network = Lenet5XXX(learning_rate=0.1)
+
     data_manager = DataManager('/home/agladyshev/Documents/UNN/DL/Datasets/cifar-10-batches-py/data_batch_1', like_images=True)
     X_train, X_val, y_train, y_val = data_manager.get_train_data()
 
-    network = get_model('lenet5')
-
     train_log = []
     val_log = []
-
-    for epoch in range(25):
+    for epoch in range(10):
         for x_batch, y_batch in iterate_minibatches(X_train, y_train, batchsize=32, shuffle=True):
-            loss = train(network, x_batch, y_batch, SoftmaxCCE)
+            loss = network.train_on_batch(x_batch, y_batch, SoftmaxCCE)
 
-        train_log.append(np.mean(predict(network, X_train) == y_train))
-        val_log.append(np.mean(predict(network, X_val) == y_val))
+        train_log.append(np.mean(network.predict(X_train) == y_train))
+        val_log.append(np.mean(network.predict(X_val) == y_val))
 
         print("Epoch", epoch)
         print("Loss: ", loss)
